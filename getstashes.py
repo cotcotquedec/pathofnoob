@@ -1,8 +1,9 @@
-import requests
-import sys
-import json
-import pprint
 import os
+import pprint
+import sys
+
+import couchbase
+import requests
 from couchbase.cluster import Cluster, ClusterOptions
 from couchbase_core.cluster import PasswordAuthenticator
 
@@ -19,22 +20,29 @@ cb_var = cluster.bucket('var').default_collection()
 # CONSTANT
 URL_STASHES = 'http://www.pathofexile.com/api/public-stash-tabs'
 # STASH POE NINJA : https://poe.ninja/stats
-# START_FROM_STASH = '614143924-630793751-598766722-679827371-647299929'
-START_FROM_STASH = '614144951-630794713-598767677-679829094-647301124'
-LEAGUE = 'Metamorph'
-# LEAGUE = 'Standard'
-CATEGORY = 'jewels'
+START_FROM_STASH = '621867829-637773604-605562457-687191730-654910930'
+# LEAGUE = 'Metamorph'
+LEAGUE = 'Standard'
 
 process = True
 
-# GET SCAN CONFIG
-scan = cb_var.get('scan').content
+# GET SCAN CONFIG, create it if not exist
+try:
+    scan = cb_var.get('scan').content
+except couchbase.exceptions.KeyNotFoundException:
+    print('Set new scan var....')
+    scan = {'next_change_id': START_FROM_STASH}
+    cb_var.upsert('scan', scan)
+else:
+    sys.stderr.write("Error on getting scan var")
 
+# STATS VARS
 calls_ct = 0
 stashes_ct = 0
 items_ct = 0
 jewels_ct = 0
 
+# MAIN LOOP
 while (process == True):
 
     print('------------------------')
@@ -90,7 +98,10 @@ while (process == True):
             if not 'extended' in item or len(item['extended']) == 0:
                 continue
 
-            if item['extended']['category'] != CATEGORY:
+            # GET ONLY REGULAR JEWELS
+            if item['extended']['category'] != 'jewels':
+                continue
+            if 'abyssJewel' in item and item['abyssJewel']:
                 continue
 
             # CHECK IF PRICE
