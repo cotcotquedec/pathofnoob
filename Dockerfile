@@ -60,6 +60,11 @@ RUN pip install --pre couchbase
 # PIP PACKAGE
 RUN pip install scipy numpy matplotlib pandas sklearn requests
 
+# INSTALL APP
+RUN mkdir /app
+COPY . /app
+WORKDIR /app
+
 EXPOSE 8000
 EXPOSE 8001
 CMD ["jupyterhub"]

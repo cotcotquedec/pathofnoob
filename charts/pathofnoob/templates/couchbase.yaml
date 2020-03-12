@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pathofnoob
+  name: couchbase
 spec:
   replicas: 1
   selector:
@@ -51,7 +51,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: couchbase
-  namespace: base
 spec:
   clusterIP: None
   ports:
@@ -60,7 +59,7 @@ spec:
       protocol: TCP
       targetPort: 8091
   selector:
-    base: couchbase
+    pathofnoob: couchbase
   sessionAffinity: None
   type: ClusterIP
 

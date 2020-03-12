@@ -22,7 +22,7 @@ spec:
               value: {{ .Values.couchbase.password }}
             - name: DB_USER
               value: {{ .Values.couchbase.user }}
-          image: pathofnoob
+          image: cotcotquedec/pathofnoob
           imagePullPolicy: IfNotPresent
           name: pathofnoob
           resources: {}
@@ -91,7 +91,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: jupyter
+              serviceName: pathofnoob
               servicePort: 8000
             path: /
 
