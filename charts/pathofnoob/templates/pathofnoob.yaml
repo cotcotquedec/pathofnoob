@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pathofnoob
+spec:
+  selector:
+    matchLabels:
+      pathofnoob: pathofnoob
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        pathofnoob: pathofnoob
+    spec:
+      containers:
+        - env:
+            - name: DB_PASSWORD
+              value: {{ .Values.couchbase.password }}
+            - name: DB_USER
+              value: {{ .Values.couchbase.user }}
+          image: pathofnoob
+          imagePullPolicy: IfNotPresent
+          name: pathofnoob
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          stdin: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+          volumeMounts:
+            {{ if .Values.source }}
+            - mountPath: /app
+              name: source
+      {{ end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        {{ if .Values.source }}
+        - hostPath:
+            path: {{ .Values.source | quote }}
+            type: ""
+          name: source
+  {{ end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pathofnoob
+spec:
+  clusterIP: None
+  ports:
+    - name: default
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    pathofnoob: pathofnoob
+  sessionAffinity: None
+  type: ClusterIP
+
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: pathofnoob
+  annotations:
+    #ENABLE BASIC AUTH
+    {{- if .Values.url.htpasswd }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: htpasswd
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+  {{- end }}
+
+# LISTE ROUTE
+spec:
+  rules:
+    - host: {{ .Values.url.pathofnoob }}
+      http:
+        paths:
+          - backend:
+              serviceName: jupyter
+              servicePort: 8000
+            path: /
+
+  # ENABLE TLS
+  {{- if .Values.url.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.url.pathofnoob }}
+  {{- end }}

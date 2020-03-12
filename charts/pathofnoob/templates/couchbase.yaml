@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pathofnoob
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pathofnoob: couchbase
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        pathofnoob: couchbase
+    spec:
+      containers:
+        - image: couchbase
+          imagePullPolicy: IfNotPresent
+          name: couchbase
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {}
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          stdin: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+          volumeMounts:
+            - mountPath: /opt/couchbase/var
+              name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - hostPath:
+            path: {{ .Values.couchbase.path_on_node }}
+            type: ""
+          name: data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchbase
+  namespace: base
+spec:
+  clusterIP: None
+  ports:
+    - name: default
+      port: 8091
+      protocol: TCP
+      targetPort: 8091
+  selector:
+    base: couchbase
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: couchbase
+  annotations:
+    #ENABLE BASIC AUTH
+    {{- if .Values.url.htpasswd }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: htpasswd
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+  {{- end }}
+
+# LISTE ROUTE
+spec:
+  rules:
+    - host: {{ .Values.url.couchbase }}
+      http:
+        paths:
+          - backend:
+              serviceName: couchbase
+              servicePort: 8091
+            path: /
+
+  # ENABLE TLS
+  {{- if .Values.url.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.url.couchbase }}
+  {{- end }}
