@@ -1,0 +1,34 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: getstashes
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cron
+          containers:
+            - image: bitnami/kubectl
+              imagePullPolicy: IfNotPresent
+              name: kubectl
+              command: ["bash"]
+              args: ["-c", "kubectl exec -it $(kubectl get pods -o name | grep -m1 pathofnoob | cut -d'/' -f 2) -- python /app/getstashes.py"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities: {}
+                privileged: false
+                procMount: Default
+                readOnlyRootFilesystem: false
+                runAsNonRoot: false
+              stdin: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              tty: true
+          restartPolicy: Never
+          dnsPolicy: ClusterFirst
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+      backoffLimit: 1
