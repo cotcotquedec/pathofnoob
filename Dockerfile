@@ -2,7 +2,7 @@ FROM python:buster
 
 # PACKAGE DE BASE
 RUN apt update && apt install -y --no-install-recommends \
-    build-essential git-all cmake
+    build-essential git-all cmake npm nodejs
 
 # COUCHBASE
 RUN wget https://packages.couchbase.com/clients/c/repos/deb/couchbase.key \
@@ -21,3 +21,10 @@ RUN pip install scipy numpy matplotlib pandas sklearn requests
 # PIP COUCHBASE
 RUN pip install --pre couchbase
 
+# Jupyter
+RUN npm install -g configurable-http-proxy \
+    && pip install jupyterhub \
+    && pip install --upgrade notebook
+
+
+CMD ["jupyterhub"]

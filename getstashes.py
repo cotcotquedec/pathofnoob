@@ -1,9 +1,9 @@
 import os
 import pprint
 import sys
-
 import couchbase
 import requests
+from datetime import datetime
 from couchbase.cluster import Cluster, ClusterOptions
 from couchbase_core.cluster import PasswordAuthenticator
 
@@ -110,6 +110,9 @@ while (process == True):
 
             # FORMAT ITEM
             item['stash'] = stash
+
+            # SCAN DATE
+            item['scanned_at'] = str(datetime.now())
 
             # INSERT
             cb_items.upsert('i:' + item['id'], item)
