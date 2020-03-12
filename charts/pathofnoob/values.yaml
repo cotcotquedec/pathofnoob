@@ -1,0 +1,12 @@
+url:
+  pathofnoob: "pathofnoob.lc"
+  couchbase: "couchbase.lc"
+  tls: false
+  htpasswd: "pathofnoob:{SHA}4DaKguaPDMP0wUkFEEVVFsdsOzY="
+
+couchbase:
+  user: "pathofnoob"
+  password: "passofnoob"
+  path_on_node: "/data/couchbase"
+
+source: "/data/pathofnoob"
