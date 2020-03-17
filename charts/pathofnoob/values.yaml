@@ -1,3 +1,6 @@
+images:
+  pathofnoob: cotcotquedec/pathofnoob
+
 url:
   pathofnoob: "pathofnoob.lc"
   couchbase: "couchbase.lc"
@@ -8,5 +11,9 @@ couchbase:
   user: "pathofnoob"
   password: "passofnoob"
   path_on_node: "/data/couchbase"
+
+poe:
+  league: Delirium
+  start_stash: "628547602-644168642-612481414-694715936-662332760"
 
 source: "/data/pathofnoob"

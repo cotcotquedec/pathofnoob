@@ -2,3 +2,4 @@ venv
 .idea
 __pycache__
 charts/pathofnoob/values.*.yaml
+jupiterhub*

@@ -19,10 +19,11 @@ cb_var = cluster.bucket('var').default_collection()
 
 # CONSTANT
 URL_STASHES = 'http://www.pathofexile.com/api/public-stash-tabs'
-# STASH POE NINJA : https://poe.ninja/stats
-START_FROM_STASH = '621867829-637773604-605562457-687191730-654910930'
-# LEAGUE = 'Metamorph'
-LEAGUE = 'Standard'
+
+# LEAGUE
+league = os.environ.get('POE_LEAGUE')
+if league is None:
+    league = "Standart"
 
 process = True
 
@@ -31,10 +32,18 @@ try:
     scan = cb_var.get('scan').content
 except couchbase.exceptions.KeyNotFoundException:
     print('Set new scan var....')
-    scan = {'next_change_id': START_FROM_STASH}
+
+    # STASH => POE NINJA : https://poe.ninja/stats
+    start_from_stash = os.environ.get('POE_START_STASH')
+    if start_from_stash is None:
+        sys.stderr.write("Specify envar POE_START_STASH : https://poe.ninja/stats")
+        exit(2)
+
+    scan = {'next_change_id': start_from_stash}
     cb_var.upsert('scan', scan)
 else:
     sys.stderr.write("Error on getting scan var")
+
 
 # STATS VARS
 calls_ct = 0
@@ -65,6 +74,12 @@ while (process == True):
     data = response.json()
 
     # Nest call
+
+    # CAS DE SCAN FINI
+    if data['next_change_id'] == scan['next_change_id']:
+        process = False
+        continue
+
     scan['next_change_id'] = data['next_change_id']
 
     # Go on stashes
@@ -82,7 +97,7 @@ while (process == True):
             continue
 
         # Check league
-        if stash['league'] != LEAGUE:
+        if stash['league'] != league:
             continue
 
         # GET ITEMS
@@ -127,4 +142,4 @@ while (process == True):
     print('Items : ' + str(items_ct))
     print('Jewels Added : ' + str(jewels_ct))
 
-print('DONE')
+print('DONE WITH STASHE : ' + start_from_stash)

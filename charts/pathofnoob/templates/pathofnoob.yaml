@@ -22,7 +22,11 @@ spec:
               value: {{ .Values.couchbase.password }}
             - name: DB_USER
               value: {{ .Values.couchbase.user }}
-          image: cotcotquedec/pathofnoob
+            - name: POE_LEAGUE
+              value: {{ .Values.poe.league }}
+            - name: POE_START_STASH
+              value: {{ .Values.poe.start_stash }}
+          image: {{ .Values.images.pathofnoob }}
           imagePullPolicy: IfNotPresent
           name: pathofnoob
           resources: {}

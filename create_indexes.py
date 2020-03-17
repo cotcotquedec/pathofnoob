@@ -16,4 +16,4 @@ cb = cluster.bucket('items').default_collection()
 
 # CREATION DES INDEX
 cb.query('CREATE PRIMARY INDEX `items-primary-index` ON `items` USING GSI;').execute()
-# cb.query('CREATE PRIMARY INDEX `corrupted-index` ON `items` USING GSI;').execute()
+cb.query('CREATE INDEX `items-corrupted-index` ON items(corrupted) USING GSI;').execute()
