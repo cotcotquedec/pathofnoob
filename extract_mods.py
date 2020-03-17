@@ -2,21 +2,6 @@ from connectdb import Db
 from pprint import pprint
 import re
 
-# MODS
-mods = []
-file = open('mods_test.txt', 'r')
-lines = file.readlines()
-
-# Strips the newline character
-for line in lines:
-    # CLEAN
-    data = line.strip().split("@")
-    if len(data) != 3:
-        continue
-    data[0] = data[0].replace('+', r"\+")
-    data[0] = data[0].replace('#', r'\d+')
-    mods.append(data)
-
 # CONNECT DB
 db = Db()
 
