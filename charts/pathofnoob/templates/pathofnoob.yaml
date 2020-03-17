@@ -26,7 +26,7 @@ spec:
               value: {{ .Values.poe.league }}
             - name: POE_START_STASH
               value: {{ .Values.poe.start_stash }}
-          image: {{ .Values.images.pathofnoob }}
+          image: {{ printf "%s:%s" .Values.images.pathofnoob (.Chart.AppVersion | default "latest" ) }}
           imagePullPolicy: IfNotPresent
           name: pathofnoob
           resources: {}

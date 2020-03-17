@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: extract_mods
+  name: extract-mods
 spec:
   schedule: "*/10 * * * *"
   jobTemplate:

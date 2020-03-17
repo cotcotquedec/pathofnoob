@@ -52,7 +52,7 @@ items_ct = 0
 jewels_ct = 0
 
 # MAIN LOOP
-while (process == True):
+while (process == True and calls_ct < 100):
 
     print('------------------------')
     print('Stash id:' + scan['next_change_id'])
