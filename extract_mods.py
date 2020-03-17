@@ -23,8 +23,7 @@ db = Db()
 # GET ITEMS BUCKET
 cb = db.get_bucket_items()
 
-result = cb.query('SELECT * FROM items LIMIT 2')
-
+result = cb.query('SELECT * FROM items WHERE learningData IS MISSING LIMIT 20000')
 
 # FORMAT MOD FUNCTION
 def format_mod(mod):
@@ -33,6 +32,9 @@ def format_mod(mod):
     return mod
 
 
+extracted_items = 0
+
+# GO!
 for row in result:
     item = row['items']
 
@@ -62,6 +64,13 @@ for row in result:
     # PRICE
     price = item['note'].replace('~b/o ', '')
     price = price.replace('~price ', '')
-    learningData['price'] = price
+    learningData['price'] = price.split()
 
-    pprint(learningData)
+    # FORMAT
+    item['learningData'] = learningData
+
+    # SAVE
+    cb.upsert('i:' + item['id'], item)
+    extracted_items += 1
+
+print('Done with : ' + str(extracted_items) + ' items')
