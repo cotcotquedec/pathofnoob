@@ -142,4 +142,4 @@ while (process == True and calls_ct < 100):
     print('Items : ' + str(items_ct))
     print('Jewels Added : ' + str(jewels_ct))
 
-print('DONE WITH STASHE : ' + start_from_stash)
+print('DONE WITH STASHE : ' + str(scan['next_change_id']))
